@@ -23,6 +23,26 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      <View style={styles.card}>
+        <Image source={{ uri: todayMeal.image }} style={styles.image} />
+        <View style={styles.cardContent}>
+          <Text style={styles.mealName}>{todayMeal.name}</Text>
+          <Text style={styles.calories}>
+            🔥 {todayMeal.calories} kcal
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <Image source={{ uri: todayMeal.image }} style={styles.image} />
+        <View style={styles.cardContent}>
+          <Text style={styles.mealName}>{todayMeal.name}</Text>
+          <Text style={styles.calories}>
+            🔥 {todayMeal.calories} kcal
+          </Text>
+        </View>
+      </View>
+      
       <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Browse Plans</Text>
       </TouchableOpacity>
