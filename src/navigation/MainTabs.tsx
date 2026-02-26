@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/home/HomeScreen";
+import MealDetailsScreen from "../screens/meal/MealDetailsScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import SubscriptionStack from "./SubscriptionStack";
 import HomeStack from "./HomeStack";
@@ -12,6 +12,7 @@ export default function MainTabs() {
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="MealDetails" component={MealDetailsScreen} />
       <Tab.Screen name="Subscriptions" component={SubscriptionStack} />
     </Tab.Navigator>
   );

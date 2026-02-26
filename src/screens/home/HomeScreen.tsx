@@ -5,15 +5,18 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  TextInput
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, SPACING, RADIUS } from "../../constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 
 export default function HomeScreen({ navigation }: any) {
   const userName = "Rohan";
   const address = "Sector 62, Noida";
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   const upcomingMeals = [
     {
       id: "1",
@@ -58,6 +61,13 @@ export default function HomeScreen({ navigation }: any) {
     },
   ];
 
+  const filteredRestaurants = restaurants.filter((restaurant) =>
+    restaurant.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredMeals = upcomingMeals.filter((meal) =>
+    meal.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -83,49 +93,128 @@ export default function HomeScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
-        {/* UPCOMING MEALS */}
-        <Text style={styles.sectionTitle}>Upcoming Meals 🍱</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {upcomingMeals.map((meal) => (
-            <TouchableOpacity
-                  key={meal.id}
-                  style={styles.mealCard}
-                  onPress={() =>
-                    navigation.navigate("MealDetails", { meal })
-                  }
-                >
-              <Image source={{ uri: meal.image }} style={styles.mealImage} />
-              <Text style={styles.mealName}>{meal.name}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {/* RESTAURANTS SECTION */}
-        <Text style={styles.sectionTitle}>Explore More Kitchens 🍽</Text>
-        {restaurants.map((restaurant) => (
+        
+        {/* SEARCH BAR */}
         <TouchableOpacity
-          key={restaurant.id}
-          style={styles.restaurantCard}
-          onPress={() =>
-            navigation.navigate("RestaurantDetails", { restaurant })
-          }
+          style={styles.searchContainer}
+          onPress={() => navigation.navigate("Search")}
         >
-          <Image
-            source={{ uri: restaurant.image }}
-            style={styles.restaurantImage}
-          />
-          <View style={styles.restaurantInfo}>
-            <Text style={styles.restaurantName}>
-              {restaurant.name}
+          <View style={styles.searchFakeInput}>
+            <Text style={{ color: COLORS.textSecondary }}>
+              🔍 Search for kitchens or meals...
             </Text>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>
-                {restaurant.tag}
-              </Text>
-            </View>
           </View>
-        </TouchableOpacity>
-      ))}
+        </TouchableOpacity>   
+        
+        {!isSearching ? (
+            <>
+          {/* UPCOMING MEALS */}
+                  <Text style={styles.sectionTitle}>Upcoming Meals 🍱</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {upcomingMeals.map((meal) => (
+                      <TouchableOpacity
+                            key={meal.id}
+                            style={styles.mealCard}
+                            onPress={() =>
+                              navigation.navigate("MealDetails", { meal })
+                            }
+                          >
+                        <Image source={{ uri: meal.image }} style={styles.mealImage} />
+                        <Text style={styles.mealName}>{meal.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+
+                  {/* RESTAURANTS SECTION */}
+                  <Text style={styles.sectionTitle}>Explore More Kitchens 🍽</Text>
+                  {restaurants.map((restaurant) => (
+                  <TouchableOpacity
+                    key={restaurant.id}
+                    style={styles.restaurantCard}
+                    onPress={() =>
+                      navigation.navigate("RestaurantDetails", { restaurant })
+                    }
+                  >
+                    <Image
+                      source={{ uri: restaurant.image }}
+                      style={styles.restaurantImage}
+                    />
+                    <View style={styles.restaurantInfo}>
+                      <Text style={styles.restaurantName}>
+                        {restaurant.name}
+                      </Text>
+                      <View style={styles.tag}>
+                        <Text style={styles.tagText}>
+                          {restaurant.tag}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+            </>
+          ) : (
+            <View style={{ marginTop: SPACING.lg }}>
+              
+              {searchQuery.length === 0 ? (
+                <Text style={{ color: COLORS.textSecondary }}>
+                  Start typing to search...
+                </Text>
+              ) : (
+                <>
+        {/* RESTAURANT RESULTS */}
+        {filteredRestaurants.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Kitchens</Text>
+            {filteredRestaurants.map((restaurant) => (
+              <TouchableOpacity
+                key={restaurant.id}
+                style={styles.restaurantCard}
+                onPress={() =>
+                  navigation.navigate("RestaurantDetails", { restaurant })
+                }
+              >
+                <Image
+                  source={{ uri: restaurant.image }}
+                  style={styles.restaurantImage}
+                />
+                <View style={styles.restaurantInfo}>
+                  <Text style={styles.restaurantName}>
+                    {restaurant.name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </>
+        )}
+
+        {/* MEAL RESULTS */}
+        {filteredMeals.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Meals</Text>
+            {filteredMeals.map((meal) => (
+              <TouchableOpacity
+                key={meal.id}
+                style={styles.mealCard}
+                onPress={() =>
+                  navigation.navigate("MealDetails", { meal })
+                }
+              >
+                <Image
+                  source={{ uri: meal.image }}
+                  style={styles.mealImage}
+                />
+                <Text style={styles.mealName}>
+                  {meal.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </>
+        )}
+      </>
+    )}
+  </View>
+)}
+       
       </ScrollView>
     </SafeAreaView>
   );
@@ -202,4 +291,34 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
+
+searchRow: {
+  flexDirection: "row",
+  alignItems: "center",
+},
+
+searchInput: {
+  flex: 1,
+  backgroundColor: COLORS.card,
+  padding: SPACING.md,
+  borderRadius: RADIUS.lg,
+},
+
+cancelButton: {
+  marginLeft: SPACING.sm,
+},
+
+cancelText: {
+  color: COLORS.primary,
+  fontWeight: "600",
+},
+searchContainer: {
+  marginBottom: SPACING.lg,
+},
+
+searchFakeInput: {
+  backgroundColor: COLORS.card,
+  padding: SPACING.md,
+  borderRadius: RADIUS.lg,
+},
 });
