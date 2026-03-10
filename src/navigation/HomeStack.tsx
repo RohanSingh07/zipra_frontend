@@ -2,7 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../screens/home/HomeScreen";
 import AddressSelectionScreen from "../screens/address/AddressSelectionScreen";
 import RestaurantDetailsScreen from "../screens/restaurant/RestaurantDetailsScreen";
-import SearchScreen from "../screens/search/searchScreen";
+import SearchScreen from "../screens/search/SearchScreen";
 const Stack = createNativeStackNavigator();
 
 export default function HomeStack() {
