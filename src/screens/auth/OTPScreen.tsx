@@ -1,34 +1,72 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useState } from "react";
 import { COLORS, SPACING, RADIUS } from "../../constants/theme";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+
 
 export default function OTPScreen({ navigation }: any) {
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useContext(AuthContext);
+
+  const handleVerify= async () => {
+    if (otp.length !== 6) {
+      Alert.alert("Invalid OTP", "Please enter the 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+
+    // Mock verification
+    if (otp === "123456") {
+      await login({
+        user: { phone: "9999999999" },
+        access: "dummy_token"
+      });
+      } else {
+        Alert.alert("Incorrect OTP", "The OTP you entered is incorrect");
+      }
+
+    setLoading(false);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Verify OTP</Text>
-      <Text style={styles.subtitle}>
-        Enter the 6-digit code sent to your phone
-      </Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.container}>
+          <Text style={styles.title}>Verify OTP</Text>
+          <Text style={styles.subtitle}>
+            Enter the 6-digit code sent to your phone
+          </Text>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          keyboardType="number-pad"
-          maxLength={6}
-          value={otp}
-          onChangeText={setOtp}
-          style={styles.input}
-        />
-      </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              keyboardType="number-pad"
+              maxLength={6}
+              autoFocus
+              value={otp}
+              onChangeText={setOtp}
+              style={styles.input}
+            />
+          </View>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.replace("Main")}
-        >
-        <Text style={styles.buttonText}>Verify & Continue</Text>
-        </TouchableOpacity>
-    </View>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              otp.length !== 6 && { opacity: 0.5 }
+            ]}
+            disabled={otp.length !== 6 || loading}
+            onPress={handleVerify}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Verifying..." : "Verify & Continue"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
   );
 }
 
@@ -57,11 +95,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     marginBottom: SPACING.lg,
-    alignItems: "center",
   },
   input: {
     fontSize: 22,
     letterSpacing: 8,
+    height: 50,
+    textAlign: "center",
   },
   button: {
     backgroundColor: COLORS.primary,

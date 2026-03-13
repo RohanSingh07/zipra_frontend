@@ -1,9 +1,30 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { COLORS, SPACING, RADIUS } from "../../constants/theme";
 import { useState } from "react";
 
 export default function LoginScreen({ navigation }: any) {
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSendOTP = async () => {
+    if (phone.length !== 10) {
+      Alert.alert("Invalid Phone", "Please enter a valid 10 digit phone number");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Backend call will go here later
+
+      navigation.navigate("OTP", { phone });
+
+    } catch (err) {
+      Alert.alert("Error", "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -15,16 +36,23 @@ export default function LoginScreen({ navigation }: any) {
           placeholder="Enter phone number"
           keyboardType="phone-pad"
           value={phone}
-          onChangeText={setPhone}
+          onChangeText={(text) => setPhone(text.replace(/[^0-9]/g, ""))}
+          maxLength={10}
           style={styles.input}
         />
       </View>
 
       <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("OTP")}
+        style={[
+          styles.button,
+          phone.length !== 10 && { opacity: 0.5 }
+        ]}
+        disabled={phone.length !== 10 || loading}
+        onPress={handleSendOTP}
       >
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>
+          {loading ? "Sending OTP..." : "Continue"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
