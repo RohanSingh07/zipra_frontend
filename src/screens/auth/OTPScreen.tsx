@@ -3,32 +3,39 @@ import { useState } from "react";
 import { COLORS, SPACING, RADIUS } from "../../constants/theme";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import API from "@/src/api/client";
 
-
-export default function OTPScreen({ navigation }: any) {
+export default function OTPScreen({ navigation, route }: any) {
+  const { phone } = route.params; 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
 
-  const handleVerify= async () => {
+  const handleVerify = async () => {
     if (otp.length !== 6) {
       Alert.alert("Invalid OTP", "Please enter the 6-digit OTP");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // Mock verification
-    if (otp === "123456") {
-      await login({
-        user: { phone: "9999999999" },
-        access: "dummy_token"
+      const res = await API.post("/auth/verify-otp/", {
+        phone: phone,
+        otp: otp,
       });
-      } else {
-        Alert.alert("Incorrect OTP", "The OTP you entered is incorrect");
-      }
 
-    setLoading(false);
+      const { access, user } = res.data;
+
+      // ✅ Centralized login (stores + sets user)
+      await login({ user, access });
+
+    } catch (err: any) {
+      console.log(err?.response?.data || err.message);
+      Alert.alert("Invalid OTP", "The OTP you entered is incorrect");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

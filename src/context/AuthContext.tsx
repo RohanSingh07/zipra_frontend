@@ -25,8 +25,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const restoreSession = async () => {
     const storedUser = await SecureStore.getItemAsync("user");
+    const token = await SecureStore.getItemAsync("access_token");
 
-    if (storedUser) {
+    if (storedUser && token) {
       setUser(JSON.parse(storedUser));
     }
 

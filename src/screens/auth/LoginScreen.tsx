@@ -1,6 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { COLORS, SPACING, RADIUS } from "../../constants/theme";
 import { useState } from "react";
+import API from "../../api/client";
 
 export default function LoginScreen({ navigation }: any) {
   const [phone, setPhone] = useState("");
@@ -15,11 +16,19 @@ export default function LoginScreen({ navigation }: any) {
     try {
       setLoading(true);
 
-      // Backend call will go here later
+      const res = await API.post("/auth/send-otp/", {
+        phone: phone,
+      });
 
+      console.log("OTP Response:", res.data);
+
+      // Navigate to OTP screen
       navigation.navigate("OTP", { phone });
 
-    } catch (err) {
+    } catch (err: any) {
+      console.log("FULL ERROR:", err);
+      console.log("DATA:", err?.response?.data);
+      console.log("STATUS:", err?.response?.status);
       Alert.alert("Error", "Failed to send OTP");
     } finally {
       setLoading(false);
